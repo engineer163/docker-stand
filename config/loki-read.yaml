@@ -1,0 +1,57 @@
+target: querier
+auth_enabled: false
+
+common:
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+  storage:
+    s3:
+      s3: http://minioadmin:minioadmin@172.20.0.2:9000
+      bucketnames: loki
+      insecure: true
+      s3forcepathstyle: true
+      #egion: piano-loki
+
+server:
+  http_listen_address: 0.0.0.0
+  grpc_listen_address: 0.0.0.0
+  log_level: info
+
+ruler:
+  rule_path: /loki/rules
+  ruler_client:
+    tls_insecure_skip_verify: true
+
+schema_config:
+  configs:
+  - from: 2020-08-01
+    store: boltdb-shipper
+    object_store: aws
+    schema: v11
+    index:
+      prefix: index_
+      period: 24h
+
+storage_config:
+  index_queries_cache_config:
+    enable_fifocache: true
+  boltdb_shipper:
+    shared_store: s3
+    active_index_directory: /loki/index
+    cache_location: /loki/boltdb-cache
+
+query_range:
+  parallelise_shardable_queries: true
+  cache_results: true
+  results_cache:
+    cache:
+      enable_fifocache: true
+      fifocache:
+        max_size_bytes: 20GB
+
+querier:
+  query_ingesters_within: 4h
+  max_concurrent: 2
+  query_timeout: 3m

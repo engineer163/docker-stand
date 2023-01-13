@@ -1,0 +1,11 @@
+# Grafana config
+apiVersion: 1
+
+datasources:
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki-read:3100
+    version: 1
+    editable: false
+    isDefault: true
